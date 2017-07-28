@@ -1,0 +1,3 @@
+http://www.linuxidc.com/Linux/2016-04/130559.htm
+
+C:\ProgramData\Oracle\Java\javapath;D:\appsinstalled\Python35\Scripts\;D:\appsinstalled\Python35\;D:\appsinstalled\Python27\;D:\appsinstalled\Python27\Scripts;C:\Windows\system32;%ORACLE_HOME%\BIN;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\appsinstalled\Git\cmd;D:\appsinstalled\Python27;%JAVA_HOME%\bin;%JAVA_HOME%\jre\bin;D:\appsinstalled\Xshell 5;D:\appsinstalled\Xftp 5;C:\Program Files\TortoiseSVN\bin;C:\app\Administrator\product\11.2.0\dbhome_1\client;

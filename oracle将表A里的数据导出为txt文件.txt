@@ -1,0 +1,120 @@
+分几步：6
+
+1，创建文本文件导出路径：例如在E盘expdatafile目录下导出成txt文本文件，要创建好这个E:\staticticsfrompact\expdatafile目录。
+
+ 
+
+2，在sqlplus下用sysdba登录，执行以下sql：create or replace directory TMP as 'E:\staticticsfrompact\expdatafile';
+create or replace directory exp_url as 'E:\staticticsfrompact\expdatafile';
+
+
+
+
+3，grant read,write on directory TMP to 你要导出表数据成txt文本文件的用户;
+grant read,write on directory exp_url to scott;
+ 
+
+4，alter system set utl_file_dir='c:\test' scope=spfile;
+alter system set utl_file_dir='E:\staticticsfrompact\expdatafile' scope=spfile;
+
+
+以上步骤操作完，需要重启数据库
+
+ 
+
+5，最重要的一步开始了，创建存储过程
+create or replace PROCEDURE SP_OUTPUT
+is
+file_handle utl_file.file_type;
+Write_content VARCHAR2(1024);
+Write_file_name VARCHAR2(50);
+v_id int;
+v_form varchar2(10);
+cursor cur_sp_out
+is
+select id,form from a;
+begin
+open cur_sp_out;
+loop
+    fetch cur_sp_out into v_id,v_form;
+    exit when cur_sp_out%notfound;
+    write_file_name := to_char(SYSDATE,'YYYYMMDD')||'.txt';
+    file_handle := utl_file.fopen('TMP',write_file_name,'a');
+    write_content := v_id||' '||v_form;
+    --write file
+    IF utl_file.is_open(file_handle) THEN
+     utl_file.put_line(file_handle,write_content);
+    END IF;
+    --close file
+    utl_file.fclose(file_handle);
+    end loop;
+    close cur_sp_out;
+end;
+ 
+
+我建立了一个跟你一样的测试表，数据如下
+
+1
+2
+3
+4
+5
+create table a(id int,
+form varchar2(10));
+ 
+insert into a values (1,'你好');
+insert into a values (2,'你很好');
+然后执行存储过程
+
+1
+2
+3
+begin
+ SP_OUTPUT;
+end;
+执行完毕后，你在c盘test路径下会发现已经有新文件生成
+
+
+
+ 
+
+文件内容
+
+
+
+ 
+
+存储过程的话，如果表名和字段名跟你一致的话，你无须修改
+
+追问
+我在哪儿控制导出为前一天当天的数据，比如2013-11-12？我的字段里面有date这个字段
+追答
+哦，那稍微改动一下就行，我那个是生成当天的了，你用下边这个
+
+create or replace PROCEDURE SP_OUTPUT
+is
+file_handle utl_file.file_type;
+Write_content VARCHAR2(1024);
+Write_file_name VARCHAR2(50);
+v_id int;
+v_form varchar2(10);
+cursor cur_sp_out
+is
+select id,form from a where to_char(日期,'yyyymmdd')=to_char(sysdate-1,'yyyymmdd'); --如果表里有日期字段的话这么用就行
+begin
+open cur_sp_out;
+loop
+    fetch cur_sp_out into v_id,v_form;
+    exit when cur_sp_out%notfound;
+    write_file_name := to_char(SYSDATE-1,'YYYYMMDD')||'.txt';--如果这个地方要修改文件名的话，在sysdate处减1就好，其他不用改
+    file_handle := utl_file.fopen('TMP',write_file_name,'a');
+    write_content := v_id||' '||v_form;
+    --write file
+    IF utl_file.is_open(file_handle) THEN
+     utl_file.put_line(file_handle,write_content);
+    END IF;
+    --close file
+    utl_file.fclose(file_handle);
+    end loop;
+    close cur_sp_out;
+end;

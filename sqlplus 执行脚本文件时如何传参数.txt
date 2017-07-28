@@ -1,0 +1,48 @@
+d:\test.sql脚本如下:
+[sql] view plaincopy
+select &1 from &2;  
+exit;   
+执行时这样传参数:sqlplus "scott/tiger@test" @d:\test.sql sysdate dual
+注意:参数必须用&[1-9]表示,不然传不进去,会提示让手动输入参数
+[sql] view plaincopy
+C:\>sqlplus "scott/tiger@test" @d:\test.sql sysdate dual  
+  
+D:\>sqlplus "scott/tiger@test" @d:\test.sql sysdate dual  
+  
+SQL*Plus: Release 11.2.0.1.0 Production on 星期二 11月 1 21:59:00 2011  
+  
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.  
+连接到:  
+Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - Production  
+With the Partitioning, OLAP, Data Mining and Real Application Testing options  
+  
+原值    1: select &1 from &2  
+新值    1: select sysdate from dual  
+  
+SYSDATE  
+--------------  
+01-11月-11  
+  
+从 Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - Production  
+With the Partitioning, OLAP, Data Mining and Real Application Testing options 断  
+开  
+  
+D:\>  
+如果脚本中有重复用到相同的值,如果&1=&2:
+d:\tes2.sql
+[sql] view plaincopy
+delete scott.emp where no=&1  or deptno=&2;  
+commit;  
+执行时,就必须传2个参数:
+[sql] view plaincopy
+sqlplus "scott/tiger@test" @d:\test2.sql 10 10  
+小窍门: 这时用procedure就可以不用传多个相同的参数,则只用传1个参数:
+d:\test3.sql
+[sql] view plaincopy
+declare  
+    var_no number:=&1;  
+begin  
+    delete scott.emp where no=var_no or deptno=var_no;  
+    commit;  
+end;  
+sqlplus "scott/tiger@test" @d:\test3.sql 10
